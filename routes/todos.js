@@ -1,20 +1,27 @@
-const { Router } = require('express');
-
+const { Router } = require("express");
 const router = Router();
-
-router.get('/', (req, res) => {
-    res.render('index', {
-        title: 'Todo App',
-        message: 'Hello World',
-        isIndex: true
-    });
+const Todo = require("../models/Todo");
+router.get("/", async (req, res) => {
+  const todos = await Todo.find({}).lean(); //lean hata vermemesi için
+  res.render("index", {
+    title: "Todo List",
+    isIndex: true,
+    todos,
+  });
 });
 
-router.get('create', (req, res) => {
-    res.render('create', {
-        title: 'Create Todo',
-        isCreate: true
-    });
-});    
+router.get("/create", (req, res) => {
+  res.render("create", {
+    isCreate: true,
+  });
+});
+
+router.post("/create", async (req, res) => {
+  const todo = new Todo({
+    title: req.body.title,
+  });
+  await todo.save();
+  res.redirect("/");
+});
 
 module.exports = router;
